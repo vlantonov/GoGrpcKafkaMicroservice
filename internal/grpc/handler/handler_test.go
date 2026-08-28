@@ -2,7 +2,11 @@ package handler_test
 
 import (
 	"context"
+	"log/slog"
+	"os"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,9 +17,6 @@ import (
 	"github.com/vlantonov/GoGrpcKafkaMicroservice/internal/domain"
 	grpchandler "github.com/vlantonov/GoGrpcKafkaMicroservice/internal/grpc/handler"
 	"github.com/vlantonov/GoGrpcKafkaMicroservice/internal/store"
-
-	"log/slog"
-	"os"
 )
 
 // ── Fakes ────────────────────────────────────────────────────────────────────
@@ -78,13 +79,28 @@ func (f *fakeStore) UpdateStatus(_ context.Context, id string, newStatus domain.
 	return &cp, nil
 }
 
-type fakePublisher struct{ published []*domain.OrderEvent }
+type fakePublisher struct {
+	mu        sync.Mutex
+	published []*domain.OrderEvent
+}
 
 func (fp *fakePublisher) Publish(_ context.Context, e *domain.OrderEvent) error {
+	fp.mu.Lock()
+	defer fp.mu.Unlock()
 	fp.published = append(fp.published, e)
 	return nil
 }
 func (fp *fakePublisher) Close() error { return nil }
+
+// errPublisher returns an error from Publish; the done channel lets tests wait
+// for the async goroutine to complete before asserting coverage.
+type errPublisher struct{ done chan struct{} }
+
+func (ep *errPublisher) Publish(_ context.Context, _ *domain.OrderEvent) error {
+	close(ep.done)
+	return assert.AnError
+}
+func (ep *errPublisher) Close() error { return nil }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -228,4 +244,80 @@ func TestUpdateOrderStatus_InvalidTransition(t *testing.T) {
 		Id: o.ID, NewStatus: ordersv1.Status_STATUS_PENDING,
 	})
 	assert.Equal(t, codes.InvalidArgument, grpcCode(err))
+}
+
+// ── Tests: error paths not covered above ─────────────────────────────────────
+
+func TestGetOrder_InternalError(t *testing.T) {
+	t.Parallel()
+	fs := newFakeStore()
+	fs.err = assert.AnError
+	srv := newServer(fs, &fakePublisher{})
+
+	_, err := srv.GetOrder(context.Background(), &ordersv1.GetOrderRequest{Id: "any"})
+	assert.Equal(t, codes.Internal, grpcCode(err))
+}
+
+func TestListOrders_StoreError(t *testing.T) {
+	t.Parallel()
+	fs := newFakeStore()
+	fs.err = assert.AnError
+	srv := newServer(fs, &fakePublisher{})
+
+	_, err := srv.ListOrders(context.Background(), &ordersv1.ListOrdersRequest{})
+	assert.Equal(t, codes.Internal, grpcCode(err))
+}
+
+func TestUpdateOrderStatus_InternalError(t *testing.T) {
+	t.Parallel()
+	fs := newFakeStore()
+	fs.err = assert.AnError
+	srv := newServer(fs, &fakePublisher{})
+
+	_, err := srv.UpdateOrderStatus(context.Background(), &ordersv1.UpdateOrderStatusRequest{
+		Id: "any", NewStatus: ordersv1.Status_STATUS_CONFIRMED,
+	})
+	assert.Equal(t, codes.Internal, grpcCode(err))
+}
+
+// TestCreateOrder_PublishErrorIsIgnored verifies FR-09: a Kafka publish failure
+// must not fail the gRPC response. It also covers the error-logging branch in
+// publishAsync by waiting for the goroutine to complete.
+func TestCreateOrder_PublishErrorIsIgnored(t *testing.T) {
+	t.Parallel()
+	ep := &errPublisher{done: make(chan struct{})}
+	srv := newServer(newFakeStore(), ep)
+
+	resp, err := srv.CreateOrder(context.Background(), &ordersv1.CreateOrderRequest{Item: "x", Quantity: 1})
+	require.NoError(t, err)
+	assert.NotEmpty(t, resp.Order.Id)
+
+	select {
+	case <-ep.done:
+	case <-time.After(time.Second):
+		t.Fatal("publishAsync goroutine did not complete")
+	}
+}
+
+// TestUpdateOrderStatus_Cancelled exercises the CANCELLED branch in
+// domainStatusToProto, protoStatusToDomain, and statusName.
+func TestUpdateOrderStatus_Cancelled(t *testing.T) {
+	t.Parallel()
+	fs := newFakeStore()
+	o := domain.NewOrder("item", 1)
+	_ = fs.Create(context.Background(), o)
+	srv := newServer(fs, &fakePublisher{})
+
+	// Transition PENDING → CONFIRMED first.
+	_, err := srv.UpdateOrderStatus(context.Background(), &ordersv1.UpdateOrderStatusRequest{
+		Id: o.ID, NewStatus: ordersv1.Status_STATUS_CONFIRMED,
+	})
+	require.NoError(t, err)
+
+	// Then CONFIRMED → CANCELLED.
+	resp, err := srv.UpdateOrderStatus(context.Background(), &ordersv1.UpdateOrderStatusRequest{
+		Id: o.ID, NewStatus: ordersv1.Status_STATUS_CANCELLED,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, ordersv1.Status_STATUS_CANCELLED, resp.Order.Status)
 }

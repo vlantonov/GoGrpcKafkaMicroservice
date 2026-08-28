@@ -57,3 +57,20 @@ func TestSaramaProducer_PublishError(t *testing.T) {
 
 	require.NoError(t, mockProducer.Close())
 }
+
+func TestSaramaProducer_Close(t *testing.T) {
+	t.Parallel()
+
+	mockProducer := mocks.NewSyncProducer(t, nil)
+	p := producer.NewSaramaProducerFromSync(mockProducer, "orders")
+	require.NoError(t, p.Close())
+}
+
+func TestNewSaramaProducer_NoBrokers(t *testing.T) {
+	t.Parallel()
+
+	// An empty broker list causes sarama to return an error immediately.
+	p, err := producer.NewSaramaProducer([]string{}, "orders")
+	assert.Error(t, err)
+	assert.Nil(t, p)
+}
