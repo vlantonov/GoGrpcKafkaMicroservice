@@ -1,3 +1,8 @@
+run:
+  # Exclude generated protobuf code from all linters.
+  skip-dirs:
+    - gen
+
 linters:
   enable:
     - errcheck
@@ -12,10 +17,3 @@ linters-settings:
     rules:
       - name: exported
         disabled: false
-
-issues:
-  exclude-rules:
-    # Generated files do not need lint checks.
-    - path: gen/
-      linters:
-        - all
