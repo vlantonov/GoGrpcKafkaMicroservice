@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Added `permissions: contents: write` to the release workflow job to resolve a 403 error when `softprops/action-gh-release` creates a GitHub Release
+- Bumped `actions/checkout` to v7, `actions/setup-go` to v7, and `softprops/action-gh-release` to v3 to eliminate Node 20 deprecation warnings (actions now run on Node 24)
+- Replaced removed `run.skip-dirs` with `issues.exclude-dirs` in `.golangci.yml` to fix config schema validation failure on golangci-lint v1.57+
+
 ## [0.1.0] - 2026-08-28
 
 ### Added

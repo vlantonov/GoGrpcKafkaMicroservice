@@ -1,6 +1,6 @@
-run:
+issues:
   # Exclude generated protobuf code from all linters.
-  skip-dirs:
+  exclude-dirs:
     - gen
 
 linters:
