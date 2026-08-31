@@ -1,13 +1,13 @@
 module github.com/vlantonov/GoGrpcKafkaMicroservice
 
-go 1.22
+go 1.25.0
 
 require (
 	github.com/IBM/sarama v1.43.3
 	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.9.0
-	google.golang.org/grpc v1.65.0
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/grpc v1.83.2
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -30,10 +30,10 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
-	golang.org/x/crypto v0.26.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.17.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
+	golang.org/x/crypto v0.55.0 // indirect
+	golang.org/x/net v0.58.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
