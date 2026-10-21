@@ -2,7 +2,7 @@
 
 A portfolio-quality Go microservice demonstrating synchronous gRPC and asynchronous Kafka event publishing in a single binary.
 
-[![Go 1.22](https://img.shields.io/badge/go-1.22-00ADD8?logo=go)](https://go.dev/dl/)
+[![Go 1.26](https://img.shields.io/badge/go-1.26-00ADD8?logo=go)](https://go.dev/dl/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![CI](https://github.com/vlantonov/GoGrpcKafkaMicroservice/actions/workflows/ci.yml/badge.svg)](https://github.com/vlantonov/GoGrpcKafkaMicroservice/actions/workflows/ci.yml)
 
@@ -61,7 +61,7 @@ flowchart LR
 
 | Tool | Minimum version |
 |------|----------------|
-| Go | 1.22 |
+| Go | 1.26 |
 | Docker + Compose v2 | 20.10 / 2.20 |
 | `protoc` + plugins | optional (generated stubs are committed) |
 
@@ -322,7 +322,7 @@ GoGrpcKafkaMicroservice/
 ├── proto/orders/v1/orders.proto # Proto3 service definition (source of truth)
 ├── gen/orders/v1/              # Generated Go stubs — do not edit
 │
-├── Dockerfile                  # Multi-stage: golang:1.22-alpine → distroless final
+├── Dockerfile                  # Multi-stage: golang:1.26-alpine → distroless final
 ├── docker-compose.yml          # zookeeper, kafka, kafka-init, kafka-ui, app
 ├── Makefile                    # Developer workflow targets
 └── .golangci.yml               # Linter configuration
