@@ -10,10 +10,14 @@ import (
 type Status int
 
 const (
+	// StatusUnspecified indicates that no lifecycle status has been selected.
 	StatusUnspecified Status = 0
-	StatusPending     Status = 1
-	StatusConfirmed   Status = 2
-	StatusCancelled   Status = 3
+	// StatusPending indicates the order is awaiting confirmation.
+	StatusPending Status = 1
+	// StatusConfirmed indicates the order has been accepted.
+	StatusConfirmed Status = 2
+	// StatusCancelled indicates the order was cancelled.
+	StatusCancelled Status = 3
 )
 
 // Order is the central domain entity.
