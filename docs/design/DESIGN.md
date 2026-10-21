@@ -70,7 +70,7 @@ flowchart LR
 ## 2. Module / Directory Layout
 
 **Module path:** `github.com/vlantonov/GoGrpcKafkaMicroservice`  
-**Go minimum version:** `1.22`
+**Go minimum version:** `1.26`
 
 ```
 GoGrpcKafkaMicroservice/
@@ -440,7 +440,7 @@ Prefer **hand-written fakes** (simple structs that implement the consumer-define
 ```
 module github.com/vlantonov/GoGrpcKafkaMicroservice
 
-go 1.22
+go 1.26
 
 require (
     github.com/IBM/sarama              v1.43.3
