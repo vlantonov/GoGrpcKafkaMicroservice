@@ -1,7 +1,4 @@
-issues:
-  # Exclude generated protobuf code from all linters.
-  exclude-dirs:
-    - gen
+version: "2"
 
 linters:
   enable:
@@ -9,11 +6,20 @@ linters:
     - govet
     - staticcheck
     - unused
-    - gofmt
     - revive
+  exclusions:
+    # Exclude generated protobuf code from all linters.
+    paths:
+      - gen
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: false
 
-linters-settings:
-  revive:
-    rules:
-      - name: exported
-        disabled: false
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    paths:
+      - gen

@@ -9,8 +9,11 @@ import (
 )
 
 var (
-	ErrNotFound      = errors.New("order not found")
+	// ErrNotFound indicates that the requested order does not exist.
+	ErrNotFound = errors.New("order not found")
+	// ErrAlreadyExists indicates that an order with the same identifier already exists.
 	ErrAlreadyExists = errors.New("order already exists")
+	// ErrInvalidStatus indicates that the requested status transition is not allowed.
 	ErrInvalidStatus = errors.New("invalid status transition")
 )
 
