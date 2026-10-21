@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - State-transition enforcement: `PENDING → CONFIRMED`, `PENDING → CANCELLED`, `CONFIRMED → CANCELLED`; illegal transitions return gRPC `INVALID_ARGUMENT`
 - HTTP `/healthz` endpoint on port `8080` returning `{"status":"ok"}`
 - Docker Compose stack: Zookeeper, Kafka, `kafka-init` (one-shot topic creation), Kafka-UI (port `8090`), and the app service
-- Multi-stage `Dockerfile` — builder stage `golang:1.22-alpine`, final stage `gcr.io/distroless/static`
+- Multi-stage `Dockerfile` — builder stage `golang:1.26-alpine`, final stage `gcr.io/distroless/static`
 - GitHub Actions workflows: CI (build, test, coverage), lint (`golangci-lint`), release (binary upload on tag push)
 - `Makefile` targets: `proto`, `build`, `test`, `lint`, `docker-up`, `docker-down`, `help`
 - Configurable via environment variables: `GRPC_PORT`, `KAFKA_BROKERS`, `KAFKA_TOPIC`, `KAFKA_GROUP_ID`, `LOG_LEVEL`, `HEALTH_PORT`

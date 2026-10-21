@@ -119,7 +119,7 @@ Any other transition shall return gRPC status `INVALID_ARGUMENT`.
 
 ## 4. Non-Functional Requirements
 
-**NFR-01 Language & Runtime:** The service shall be written in Go ≥ 1.22. The `go.mod` minimum version directive shall reflect this.
+**NFR-01 Language & Runtime:** The service shall be written in Go ≥ 1.26. The `go.mod` minimum version directive shall reflect this.
 
 **NFR-02 Protobuf tooling:** The gRPC service contract shall be defined in `.proto` files under `proto/`. Generated Go stubs shall be committed to the repository under `gen/`.
 
