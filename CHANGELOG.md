@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-03
+
 ### Fixed
 
 - Added `permissions: contents: write` to the release workflow job to resolve a 403 error when `softprops/action-gh-release` creates a GitHub Release
